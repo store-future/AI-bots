@@ -37,7 +37,7 @@ def retrieve_context(question, custom_dataset):
     context = '\n'.join(result)  # join the matched lines to form the context as string
     return context if context else "No relevant information found in the dataset."
 
-# ------------API Making Process (chat loop) ------------------
+# ------------ ChatBot Function (chat loop) ------------------
 def chatbot(model,url):
     try :
         while True:

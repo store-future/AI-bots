@@ -48,7 +48,7 @@ def retrieve_context(question):
     question_embedding = embed_model.encode([question]).astype("float32") # embed and convert to numpy array
 
     distance,indexes = index.search(question_embedding, top_k)  # search the index for similar embeddings
-    print(f"DEBUG : distances: {distance}, indexes: {indexes}")
+    # print(f"DEBUG : distances: {distance}, indexes: {indexes}")
 
     result =[]
     for i in indexes[0]:  # indexes is a 2D array, we take the first row
@@ -57,8 +57,29 @@ def retrieve_context(question):
     return result
 
 # print(retrieve_context("what is python"))
-results = retrieve_context("what is python")
+# results = retrieve_context("what is python")
 
-print("\nTop Results:")
-for r in results:
-    print(r)
+# ------------ ChatBot Function  ------------------
+def ChatBot(model, url):
+    while True :
+            user_input = input("ASK IT : " )
+
+            if user_input.strip().lower() in ["exit", "quit"] :
+                print("\n\t *** USer exit form chat ***")
+                break
+            context = retrieve_context(user_input)   
+            # print("\n Retrieved Context:\n", context)     
+
+            prompt = f""" work like a chatbot assistance
+            Use only provided contect to answer.
+            if answer is not in context say - 'i don't know' 
+            
+            Context : {context}
+            Question: {user_input}
+            
+            """
+
+            payload {
+                model : model, 
+                input : prompt,
+            }
