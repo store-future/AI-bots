@@ -50,7 +50,7 @@ def retrieve_context(question):
     distance,indexes = index.search(question_embedding, top_k)  # search the index for similar embeddings
     # print(f"DEBUG : distances: {distance}, indexes: {indexes}")
 
-    result =[]
+    result = []
     for i in indexes[0]:  # indexes is a 2D array, we take the first row
         result.append(custom_data_lines[i])  # append the matched line from the custom dataset
 
@@ -61,25 +61,49 @@ def retrieve_context(question):
 
 # ------------ ChatBot Function  ------------------
 def ChatBot(model, url):
-    while True :
-            user_input = input("ASK IT : " )
+    try:
+        while True :
+                user_input = input("ASK IT : " )
 
-            if user_input.strip().lower() in ["exit", "quit"] :
-                print("\n\t *** USer exit form chat ***")
-                break
-            context = retrieve_context(user_input)   
-            # print("\n Retrieved Context:\n", context)     
+                if user_input.strip().lower() in ["exit", "quit"] :
+                    print("\n\t *** USer exit form chat ***")
+                    break
 
-            prompt = f""" work like a chatbot assistance
-            Use only provided contect to answer.
-            if answer is not in context say - 'i don't know' 
-            
-            Context : {context}
-            Question: {user_input}
-            
-            """
+                context = retrieve_context(user_input)   
+                # print("\n Retrieved Context:\n", context)     
 
-            payload {
-                model : model, 
-                input : prompt,
-            }
+                prompt = f""" work like a chatbot assistance
+                Use only provided contect to answer.
+                if answer is not in context say - 'i don't know' 
+                
+                Context : {context}
+                Question: {user_input}
+                
+                """
+
+                payload = {
+                    "model" : model, 
+                    "input" : prompt,
+                }
+
+                try :
+                    response = requests.post(url,json=payload)
+
+                    if response.status_code ==200:
+                        data = response.json()
+                        reply = data['output'][0]['content']
+                        print(f"Assistance : {reply}\n")
+                    else:
+                        print(f"Error: Received status code {response.status_code} from the API")
+                except requests.RequestException as e:
+                    print(f"error in making api request{e}")
+    except KeyboardInterrupt:
+        print("user close manually")
+
+
+
+
+if __name__ == "__main__":
+    model = "google/gemma-3-4b"
+    url = "http://localhost:1234/api/v1/chat"
+    ChatBot(model,url)
